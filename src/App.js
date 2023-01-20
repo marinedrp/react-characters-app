@@ -1,34 +1,57 @@
-import "./App.css";
-import CharactersList from "./components/CharactersList";
-import { About } from "./components/About";
-import { Contact } from "./components/Contact";
-import { ErrorPage } from "./components/ErrorPage";
-// import { PageOne } from "./components/PageOne";
-// import { PageTwo } from "./components/PageTwo";
-import { Routes, Route, Link } from "react-router-dom";
-import { CharacterDetails } from "./components/CharacterDetails";
+import axios from 'axios';
+import { useState } from 'react';
+import { useEffect } from 'react';
+import { Link, NavLink, Route, Routes } from 'react-router-dom';
+import './App.css';
+import CharactersList from './components/CharactersList';
+import CharacterDetails from './components/CharacterDetails';
+import { About } from './components/About';
+import { Contact } from './components/Contact';
 
 function App() {
+
+  const [charactersArr, setCharactersArr] = useState(null);
+
+  useEffect(() => {
+    getCharactersFromApi();
+  }, []);
+
+
+  const getCharactersFromApi = () => {
+    axios.get(process.env.REACT_APP_API_URL + "/characters")
+      .then((response) => {
+        console.log(response.data);
+
+        setCharactersArr(response.data);
+      })
+      .catch((e) => {
+        console.log(e);
+      });
+  }
+
   return (
     <div className="App">
 
-      <div>
-        <h1>This is the header</h1>
-        <Link to="/about">About</Link>
-        <Link to="/contact">Contact</Link>
-        <Link to="/">List of Characters</Link>
-        {/* <Link to="/my-character">My character</Link> */}
-      </div>
+      <nav>
+        <p>this is the header</p>
+        <NavLink to="/">Home</NavLink>
+        <NavLink to="/about">About</NavLink>
+        <NavLink to="/contact">Contact</NavLink>
+      </nav>
+
 
       <Routes>
-        <Route path="/" element={<CharactersList />} />
-        <Route path='/about' element={<About />}/>
-        <Route path='/contact' element={<Contact />}/>
-        <Route path="*" element={ <ErrorPage /> } />
-        <Route path="/character/:characterId" element={<CharacterDetails />} />
-        {/* <Route path='/one' element={<PageOne/>} />
-      <Route path='/two' element={<PageTwo/>} /> */}
+        <Route path='/' element={<CharactersList charactersArr={charactersArr} />} />
+        <Route path='/characters/:characterId' element={<CharacterDetails charactersArr={charactersArr} callbackToUpdateList={getCharactersFromApi} />} />
+        <Route path='/about' element={<About /> } />
+        <Route path='/contact' element={<Contact />} />
+        
+        <Route path="*" element={ <h2>404 - sorry, that route does not exist</h2>} />
       </Routes>
+
+      <p>this is the footer</p>
+      
+
     </div>
   );
 }

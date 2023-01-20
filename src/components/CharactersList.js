@@ -1,44 +1,26 @@
-import axios from "axios";
-import { useEffect } from "react";
-import { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link } from 'react-router-dom';
 
-export default function CharactersList() {
-  const [listOfCharacters, setListOfCharacters] = useState([]);
+function CharactersList(props) {
 
-  useEffect(() => {
-    axios
-      .get("https://ih-crud-api.herokuapp.com/characters")
-      .then((res) => {
-        let firstTenCharacters = res.data.slice(0, 10)
-        setListOfCharacters(firstTenCharacters);
-      })
-      .catch((e) => {
-        console.log(e);
-      });
-  }, []);
+    return (
+        <>
+            <h1>This is CharactersList</h1>
 
-  const deleteCharacter = (characterToDelete) => {
-    const newListOfCharacters = listOfCharacters.filter((character) => {
-        return character.name !== characterToDelete
-    })
-    setListOfCharacters(newListOfCharacters)
-  }
+            {/* <h1>number of characters: {props.charactersArr.length}</h1> */}
 
-  return (
-    <div>
-      {listOfCharacters.map((character, index) => {
-        return (
-          <div className="character" key={index}>
-            <p><b>Number: {index + 1}</b></p>
-            <p><b>Name:</b> {character.name}</p>
-            <p><b>Occupation:</b> {character.occupation}</p>
-            <p><b>Weapon:</b> {character.weapon}</p>
-            <Link to={"/character/" + character.id}>More Details</Link>
-            <button onClick={() => {deleteCharacter(character.name)}}>Delete</button>
-          </div>
-        );
-      })}
-    </div>
-  );
+            {props.charactersArr === null
+                ? "loading..."
+                : props.charactersArr.map((characterDetails, index) => {
+                    return (
+                        <div className="character" key={index} >
+                            <h2>{characterDetails.name}</h2>
+                            <p>Weapon: {characterDetails.weapon}</p>
+                            <Link to={"/characters/" + characterDetails.id}>More Details</Link>
+                        </div>
+                    )
+                })}
+        </>
+    )
 }
+
+export default CharactersList;
